@@ -11,7 +11,7 @@ Usage
 ======
 To generate CRUD for table 'apples':
    - create MySQL table 'apples' with at least 3 columns
-   - place this file in your applications root folder 
+   - place file *createcrud_w2ui.php* in your applications root folder 
    - in console type 
 
         php createcrud_w2ui.php food apples
