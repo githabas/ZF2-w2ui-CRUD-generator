@@ -7,7 +7,7 @@ To start using
    - install ZF2 skeleton-application as described in http://framework.zend.com/manual/2.0/en/user-guide/skeleton-application.html
    - include *w2ui-1.4.js* and *w2ui-1.4.css* in your application *layout.phtml* file 
  
-Ussage
+Usage
 ======
 To generate CRUD for table 'apples':
    - create MySQL table 'apples' with at least 3 columns
