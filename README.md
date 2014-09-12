@@ -5,7 +5,7 @@ It saves me a lot of time because it does the routine CRUD starting job. Script 
 To start using
 ==============
    - install ZF2 skeleton-application as described in http://framework.zend.com/manual/2.0/en/user-guide/skeleton-application.html
-   - include w2ui-1.4.js and w2ui-1.4.css in your application layout.phtml file 
+   - include *w2ui-1.4.js* and *w2ui-1.4.css* in your application *layout.phtml* file 
  
 Ussage
 ======
@@ -15,3 +15,6 @@ To generate CRUD for table 'apples':
    - in console type 
 
         php createcrud_w2ui.php food apples
+
+
+Now you can view and edit table 'apples' in your site at */food/apples* path.
