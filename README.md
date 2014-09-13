@@ -1,6 +1,6 @@
 ZF2-w2ui-CRUD-generator
 =======================
-It saves me a lot of time because it does the routine CRUD starting job. Script creates and/or updates Zend Framework 2 modules, controllers, models, views, configs files and folders. Generated tree uses w2ui (http://w2ui.com) Javascript library instead of ZF2 grids and forms.
+It saves me a lot of time because it does the routine CRUD starting job. Script creates and/or updates Zend Framework 2 modules, controllers, models, views, config files and folders. Generated tree uses w2ui (http://w2ui.com) Javascript library instead of ZF2 grids and forms.
 
 To start using
 ==============
@@ -11,7 +11,7 @@ Usage
 ======
 To generate CRUD for table 'apples':
    - create MySQL table 'apples' with at least 3 columns
-   - place file *createcrud_w2ui.php* in your applications root folder 
+   - place file *createcrud_w2ui.php* in your ZF2 application root folder 
    - in console type 
 
         php createcrud_w2ui.php food apples
