@@ -33,7 +33,7 @@ $msg_edit = 'Edit record';
 
 //---- parsing module name, controller name, dir name from command line arguments
 if (isset($argv[1])) {
-	$Name = ucwords($argv[1]);
+	$Module = ucwords($argv[1]);
 	if (isset($argv[2])) {
 		$tableName = ucwords(preg_replace_callback('/_([a-z])/i', function($matches) { return ucwords($matches[1]);	}, $argv[2]));
 		$tableDir = str_replace('_', '-', $argv[2]);
@@ -47,13 +47,13 @@ if (isset($argv[1])) {
 
 //---- generated files array; set "true" to "false" in case you don't want that file to be generated
 $filesArray = array(
-	"Module" 			 => array(true, "module/$Name/Module.php"), // 0
-	"autoload_classmap"  => array(true, "module/$Name/autoload_classmap.php"), // 1
-	"module.config" 	 => array(true, "module/$Name/config/module.config.php"),  // 2
-	"Controller" 		 => array(true, "module/$Name/src/$Name/Controller/$tableName"."Controller.php"), // 3
-	"index" 			 => array(true, "module/$Name/view/$argv[1]/$tableDir/index.phtml"), // 4
+	"Module" 			 => array(true, "module/$Module/Module.php"), // 0
+	"autoload_classmap"  => array(true, "module/$Module/autoload_classmap.php"), // 1
+	"module.config" 	 => array(true, "module/$Module/config/module.config.php"),  // 2
+	"Controller" 		 => array(true, "module/$Module/src/$Module/Controller/$tableName"."Controller.php"), // 3
+	"index" 			 => array(true, "module/$Module/view/$argv[1]/$tableDir/index.phtml"), // 4
 	"application.config" => array(true, "config/application.config.php"), // 8
-	"Model" 			 => array(true, "module/$Name/src/$Name/Model/$tableName.php"), // 9
+	"Model" 			 => array(true, "module/$Module/src/$Module/Model/$tableName.php"), // 9
 );
 
 
@@ -82,20 +82,20 @@ if(!$result = $db->query($sql)){
 
 
 //---- creating folders
-createDir("module/$Name");
-createDir("module/$Name/config");
-createDir("module/$Name/src");
-createDir("module/$Name/src/$Name");
-createDir("module/$Name/src/$Name/Controller");
-createDir("module/$Name/src/$Name/Form");
-createDir("module/$Name/src/$Name/Model");
-createDir("module/$Name/view");
-createDir("module/$Name/view/$argv[1]");
-createDir("module/$Name/view/$argv[1]/$tableDir");
+createDir("module/$Module");
+createDir("module/$Module/config");
+createDir("module/$Module/src");
+createDir("module/$Module/src/$Module");
+createDir("module/$Module/src/$Module/Controller");
+createDir("module/$Module/src/$Module/Form");
+createDir("module/$Module/src/$Module/Model");
+createDir("module/$Module/view");
+createDir("module/$Module/view/$argv[1]");
+createDir("module/$Module/view/$argv[1]/$tableDir");
 
 echo "tree ok\n";
-	
-	
+
+
 //---- Module
 $fileName = $filesArray['Module'][1];
 if (file_exists($fileName) && $filesArray['Module'][0] === false) {
@@ -107,16 +107,17 @@ if (file_exists($fileName) && $filesArray['Module'][0] === false) {
 		if (file_exists($tmp_file)) {
 			unlink($tmp_file);
 		}
-		$array0_begin = false;
-		$array1_begin = false;
-		$array1_end = false;
-		$array2_end = false;
+		$added = false;
+		$exist = false;
 			
 		if ($handle) {
 			while (($line = fgets($handle)) !== false) {
-				if ($array0_begin === false && strpos($line, 'Table;')) {
-	        		$array0_begin = true;
-					file_put_contents($tmp_file, "use $Name\Model\\$tableName".";\n", FILE_APPEND);
+				if(strpos($line, "$Module\Model\\$tableName")) {
+					$exist = true;
+				}
+				if ($added === false && $exist === false && strpos($line, 'Table;')) {
+					file_put_contents($tmp_file, "use $Module\Model\\$tableName".";\n", FILE_APPEND);
+	        		$added = true;
 				}
 				file_put_contents($tmp_file, $line, FILE_APPEND);
 			}
@@ -134,10 +135,10 @@ if (file_exists($fileName) && $filesArray['Module'][0] === false) {
 	echo '<?php'."\n";
 ?>
 
-namespace <?php echo $Name; ?>;
+namespace <?php echo $Module; ?>;
 
-use <?php echo $Name; ?>\Model\<?php echo $tableName; ?>;
-// use <?php echo $Name; ?>\Model\<?php echo $tableName; ?>Table;
+use <?php echo $Module; ?>\Model\<?php echo $tableName; ?>;
+// use <?php echo $Module; ?>\Model\<?php echo $tableName; ?>Table;
 use Zend\Db\ResultSet\ResultSet;
 // use Zend\Db\TableGateway\TableGateway;
 
@@ -166,7 +167,7 @@ class Module
     {
         return array(
             'factories' => array(
-/*                '<?php echo $Name; ?>\Model\<?php echo $tableName; ?>Table' =>  function($sm) {
+/*                '<?php echo $Module; ?>\Model\<?php echo $tableName; ?>Table' =>  function($sm) {
                     $tableGateway = $sm->get('<?php echo $tableName; ?>TableGateway');
                     $table = new <?php echo $tableName; ?>Table($tableGateway);
                     return $table;
@@ -174,7 +175,7 @@ class Module
                 '<?php echo $tableName; ?>TableGateway' => function ($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $resultSetPrototype = new ResultSet();
-                    $resultSetPrototype->setArrayObjectPrototype(new <?php echo $Name; ?>());
+                    $resultSetPrototype->setArrayObjectPrototype(new <?php echo $Module; ?>());
                     return new TableGateway('<?php echo $argv[2]; ?>', $dbAdapter, null, $resultSetPrototype);
                 }, 
             ), */
@@ -197,11 +198,6 @@ if (file_exists($fileName) && $filesArray['autoload_classmap'][0] === false) {
 	echo '<?php'."\n";
 	echo 'return array();'."\n";
 	ob_end($fileName);	
-	
-//	$htmlStr = ob_get_contents();
-//	ob_end_clean(); 
-//	file_put_contents($fileName, $htmlStr);	
-//	echo "Written $fileName\n";
 }
 
 		
@@ -218,21 +214,22 @@ if (file_exists($fileName) && $filesArray['module.config'][0] === false) {
 		}
 		$array1_begin = false;
 		$array1_end = false;
-		$skliaustai = 0;
+		$exists = false;
 	
 		if ($handle) {
 			while (($line = fgets($handle)) !== false) {
 				if (trim($line) == "'invokables' => array(") {
 	        		$array1_begin = true;
 				}
-				if (trim($line) == ")," && $array1_begin === true && $array1_end === false) {
-					if (!strpos($pline, "'$Name\Controller\\$tableName"."Controller'")) {
-						file_put_contents($tmp_file, "			'$Name\Controller\\$tableName' => '$Name\Controller\\$tableName"."Controller',\n", FILE_APPEND);
-					}
+				if (strpos($line, "$Module\Controller\\$tableName"."Controller")) {
+					$exists = true;
+				}
+				if (trim($line) == ")," && $array1_begin === true && $array1_end === false && $exists = false) {
+					file_put_contents($tmp_file, "			'$Module\Controller\\$tableName' => '$Module\Controller\\$tableName"."Controller',\n", FILE_APPEND);
 					$array1_end = true;
 				}
 				file_put_contents($tmp_file, $line, FILE_APPEND);
-				$pline = $line;
+//				$pline = $line;
 			}
 		} else {
     		echo "error opening $fileName.\n";
@@ -251,7 +248,7 @@ if (file_exists($fileName) && $filesArray['module.config'][0] === false) {
 return array(
 	'controllers' => array(
 		'invokables' => array(
-			'<?php echo $Name; ?>\Controller\<?php echo $tableName; ?>' => '<?php echo $Name; ?>\Controller\<?php echo $tableName; ?>Controller',
+			'<?php echo $Module; ?>\Controller\<?php echo $tableName; ?>' => '<?php echo $Module; ?>\Controller\<?php echo $tableName; ?>Controller',
 		),
 	),
 
@@ -276,7 +273,7 @@ return array(
                 'options' => array(
                     'route'    => '/<?php echo $argv[1]; ?>',
                     'defaults' => array(
-                        '__NAMESPACE__' => '<?php echo $Name; ?>\Controller',
+                        '__NAMESPACE__' => '<?php echo $Module; ?>\Controller',
                         'controller'    => 'Index',
                         'action'        => 'index',
                     ),
@@ -323,7 +320,7 @@ if (file_exists($fileName) && $filesArray['Controller'][0] === false) {
 	echo '<?php'."\n";
 ?>
 
-namespace <?php echo $Name; ?>\Controller;
+namespace <?php echo $Module; ?>\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
@@ -729,21 +726,22 @@ if (file_exists($file) && $filesArray['application.config'][0] !== false) {
 		unlink($tmp_file);
 	}
 	$array_begin = false;
-	$array_end = false;
+	$updated = false;
+	$exists = false;
 	
 	if ($handle) {
 		while (($line = fgets($handle)) !== false) {
 			if (trim($line) == "'modules' => array(") {
 	        	$array_begin = true;
 			}
-			if (trim($line) == ")," && $array_begin === true && $array_end === false) {
-				if (!strpos($pline, "'$Name'")) {
-					file_put_contents($tmp_file, "		'$Name',\n", FILE_APPEND);
-				}
-				$array_end = true;
+			if (strpos($line, $Module)) {
+				$exists = true;
+			}
+			if (trim($line) == ")," && $array_begin === true && $updated === false && $exists === false) {
+				file_put_contents($tmp_file, "		'$Module',\n", FILE_APPEND);
+				$updated = true;
 			}
 			file_put_contents($tmp_file, $line, FILE_APPEND);
-			$pline = $line;
 		}
 	} else {
     	echo "error opening config/application.config.php.\n";
@@ -766,7 +764,7 @@ if (file_exists($fileName) && $filesArray['Model'][0] === false) {
 		ob_start();
 		echo '<?php'."\n";
 ?>
-namespace <?php echo $Name; ?>\Model;
+namespace <?php echo $Module; ?>\Model;
 
 use Zend\InputFilter\Factory as InputFactory;
 use Zend\InputFilter\InputFilter;            
