@@ -393,19 +393,20 @@ class <?php echo $tableName; ?>Controller extends AbstractActionController
 //		$lang = $where['lang'];
 		
 		$select = $sql->select();
-		$select->from(array('C' => '<?php echo $argv[2]; ?>'));
-		$select->columns(array('recid' => '<?php echo $columns[0]; ?>', '<?php echo $columns[0]; ?>', '<?php echo $columns[1]; ?>'));
+		$select->from(array('<?php echo $argv[2]; ?>' => '<?php echo $argv[2]; ?>'));
+		$select->columns(array('recid' => '<?php echo $columns[0]; ?>', '<?php echo $argv[2]; ?>-<?php echo $columns[0]; ?>', '<?php echo $argv[2]; ?>-<?php echo $columns[1]; ?>'));
 //		$select->join(
-//     		array('CL' => 'channels_lang'), // table name
-//     		'CL.id = C.id', // expression to join on (will be quoted by platform object before insertion),
-//     		array('lang', 'name'), // (optional) list of columns, same requirements as columns() above
+//     		array('channels_lang' => 'channels_lang'), // table name
+//     		'channels_lang.id = <?php echo $argv[2]; ?>.id', // expression to join on (will be quoted by platform object before insertion),
+//     		array('channels_lang.lang', 'channels_lang.name'), // (optional) list of columns, same requirements as columns() above
 //     		$select::JOIN_LEFT // (optional), one of inner, outer, left, right also represented by constants in the API
 //		);		
-//		$select->where("CL.lang = '$lang'");
+//		$select->where("<?php echo $argv[2]; ?>.lang = '$lang'");
 		//--- order
 		if (is_array($sort)) {
 			foreach ($sort as $key => $value) {
-				$select->order($value['field'].' '.$value['direction']);
+				$field = str_replace('-', '.', $value['field']);
+				$select->order($field.' '.$value['direction']);
 			}
 		}
 		//--- search
@@ -523,7 +524,6 @@ class <?php echo $tableName; ?>Controller extends AbstractActionController
 			}
 		} else {  //-- insert
 			foreach ($tables as $key => $value) {
-				$wheres['<?php echo $argv[2]; ?>']['<?php echo $columns[0]; ?>'] = $recid;
 				$insert = $sql->insert($key);
 				$insert->values($value);
 				$query = $sql->getSqlStringForSqlObject($insert);
