@@ -394,7 +394,7 @@ class <?php echo $tableName; ?>Controller extends AbstractActionController
 		
 		$select = $sql->select();
 		$select->from(array('<?php echo $argv[2]; ?>' => '<?php echo $argv[2]; ?>'));
-		$select->columns(array('recid' => '<?php echo $columns[0]; ?>', '<?php echo $argv[2]; ?>-<?php echo $columns[0]; ?>', '<?php echo $argv[2]; ?>-<?php echo $columns[1]; ?>'));
+		$select->columns(array('recid' => '<?php echo $columns[0]; ?>', '<?php echo $argv[2]; ?>-<?php echo $columns[0]; ?>' => '<?php echo $columns[0]; ?>', '<?php echo $argv[2]; ?>-<?php echo $columns[1]; ?>' => '<?php echo $columns[1]; ?>'));
 //		$select->join(
 //     		array('channels_lang' => 'channels_lang'), // table name
 //     		'channels_lang.id = <?php echo $argv[2]; ?>.id', // expression to join on (will be quoted by platform object before insertion),
@@ -624,14 +624,14 @@ $(function () {
 			toolbarEdit: true
 		},
 		searches: [
-			{ field: '<?php echo $columns[0]; ?>', caption: '<?php echo $columns[0]; ?>', type: 'int' },
-			{ field: '<?php echo $columns[1]; ?>', caption: '<?php echo $columns[1]; ?>', type: 'text' },
-			{ field: '<?php echo $columns[2]; ?>', caption: '<?php echo $columns[2]; ?>', type: 'text' },
+			{ field: '<?php echo $argv[2]; ?>-<?php echo $columns[0]; ?>', caption: '<?php echo $columns[0]; ?>', type: 'int' },
+			{ field: '<?php echo $argv[2]; ?>-<?php echo $columns[1]; ?>', caption: '<?php echo $columns[1]; ?>', type: 'text' },
+			{ field: '<?php echo $argv[2]; ?>-<?php echo $columns[2]; ?>', caption: '<?php echo $columns[2]; ?>', type: 'text' },
 		],	
 		columns: [				
-			{ field: '<?php echo $columns[0]; ?>', caption: '<?php echo $columns[0]; ?>', size: '20%', sortable: true  },
-			{ field: '<?php echo $columns[1]; ?>', caption: '<?php echo $columns[1]; ?>', size: '40%', sortable: true  },
-			{ field: '<?php echo $columns[2]; ?>', caption: '<?php echo $columns[2]; ?>', size: '40%', sortable: true  },
+			{ field: '<?php echo $argv[2]; ?>-<?php echo $columns[0]; ?>', caption: '<?php echo $columns[0]; ?>', size: '20%', sortable: true  },
+			{ field: '<?php echo $argv[2]; ?>-<?php echo $columns[1]; ?>', caption: '<?php echo $columns[1]; ?>', size: '40%', sortable: true  },
+			{ field: '<?php echo $argv[2]; ?>-<?php echo $columns[2]; ?>', caption: '<?php echo $columns[2]; ?>', size: '40%', sortable: true  },
 		],
 /*		postData: {
 			where : {
