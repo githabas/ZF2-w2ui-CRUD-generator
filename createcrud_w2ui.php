@@ -25,6 +25,7 @@
 *
 ************************************************/
 
+// to do -- rec_id gali būti kombinuotas; tada reikia kombinuoti recid dvitaškiu funkcijose getdata ir getrecord 
 	
 //---- CRUD form header messages
 $msg_add = 'New record';
@@ -500,9 +501,8 @@ class <?php echo $tableName; ?>Controller extends AbstractActionController
 		$wheres = array();
 		foreach ($where as $key => $value) {
 			$parts = explode('-', $key);
-			$vparts = explode('-', $value);
-			if(isset($parts[1]) && isset($vparts[1])) {
-				$wheres[$parts[0]][$parts[1]] = $tables[$vparts[0]][$vparts[1]];
+			if(isset($parts[0]) && isset($parts[1])) {
+				$wheres[$parts[0]][$parts[1]] = $value;
 			}			
 		}
 		
