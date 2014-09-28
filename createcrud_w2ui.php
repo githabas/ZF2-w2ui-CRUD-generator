@@ -213,24 +213,23 @@ if (file_exists($fileName) && $filesArray['module.config'][0] === false) {
 		if (file_exists($tmp_file)) {
 			unlink($tmp_file);
 		}
-		$array1_begin = false;
-		$array1_end = false;
+		$array_begin = false;
+		$array_end = false;
 		$exists = false;
 	
 		if ($handle) {
 			while (($line = fgets($handle)) !== false) {
 				if (trim($line) == "'invokables' => array(") {
-	        		$array1_begin = true;
+	        		$array_begin = true;
 				}
 				if (strpos($line, "$Module\Controller\\$tableName"."Controller")) {
 					$exists = true;
 				}
-				if (trim($line) == ")," && $array1_begin === true && $array1_end === false && $exists = false) {
+				if (trim($line) == ")," && $array_begin === true && $array_end === false && $exists === false) {
 					file_put_contents($tmp_file, "			'$Module\Controller\\$tableName' => '$Module\Controller\\$tableName"."Controller',\n", FILE_APPEND);
-					$array1_end = true;
+					$array_end = true;
 				}
 				file_put_contents($tmp_file, $line, FILE_APPEND);
-//				$pline = $line;
 			}
 		} else {
     		echo "error opening $fileName.\n";
@@ -513,6 +512,7 @@ class <?php echo $tableName; ?>Controller extends AbstractActionController
 			$wheres['<?php echo $argv[2]; ?>']['<?php echo $columns[0]; ?>'] = $recid;
 			foreach ($tables as $table => $set) {
 				$update = $sql->update($table);
+				$set['modifier'] = $modifier;
 				$update->set($set);
 				foreach ($wheres[$table] as $where => $value) {
 					$update->where("$where = '$value'");
@@ -523,9 +523,10 @@ class <?php echo $tableName; ?>Controller extends AbstractActionController
 				$affectedRows += $result->count();
 			}
 		} else {  //-- insert
-			foreach ($tables as $key => $value) {
-				$insert = $sql->insert($key);
-				$insert->values($value);
+			foreach ($tables as $table => $set) {
+				$insert = $sql->insert($table);
+				$set['modifier'] = $modifier;
+				$insert->values($set);
 				$query = $sql->getSqlStringForSqlObject($insert);
 				$statement = $adapter->query($query);
 				$result = $statement->execute();
@@ -561,15 +562,6 @@ class <?php echo $tableName; ?>Controller extends AbstractActionController
 		$statement = $adapter->query($query);
 		$result = $statement->execute();
 		$affectedRows += $result->count();
-
-//		$delete = $sql->delete('channels_lang');
-//		$delete->where(array(
-//    		'id' => $selected,
-//		));		
-//		$query = $sql->getSqlStringForSqlObject($delete);
-//		$statement = $adapter->query($query);
-//		$result = $statement->execute();
-//		$affectedRows += $result->count();
 
 		if(is_numeric($affectedRows)) {
 			$status = "success"; 
