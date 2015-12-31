@@ -5,7 +5,7 @@ It saves me a lot of time because it does the routine job when starting new tabl
 To start using
 ==============
    - install ZF2 skeleton-application as described in http://framework.zend.com/manual/2.0/en/user-guide/skeleton-application.html
-   - include *w2ui-1.4.js* and *w2ui-1.4.css* in your application *layout.phtml* file 
+   - include *w2ui.js* and *w2ui.css* in your application *layout.phtml* file 
  
 Usage
 ======
