@@ -6,49 +6,30 @@ use Zend\Db\Sql\Sql;
 use Zend\Db\Sql\TableIdentifier;
 use Zend\Db\Sql\Expression;
 
-use Zend\ServiceManager\ServiceManager;
-use Zend\ServiceManager\ServiceManagerAwareInterface;
-
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Mvc\Controller\AbstractRestfulController;
-
-class StandartFuncs extends AbstractActionController
-//class StandartFuncs
+class StandartFuncs
 /************************************************
 *
 * == DESCRIPTION ==
-*   - caries insert & update operations based on data retrieved from w2ui forms
+*   - carries insert & update operations based on data retrieved from w2ui forms
 *      - multiple table handling
 * 	   - performs prime record on insert in child tables
-*      - checks for duplicates on require unicue fields
+*      - checks for duplicates on require unicue fields; responds with error message & field name
 *
 ************************************************/
-
 {
 	private $table_filter = array();
 
 	public function setTableFilter($tables)
 	{
-		//-- tables to skip ()
+		//-- tables whitelist
 		$this->table_filter = $tables;
 	}
 
-	public function getServiceConfig()
-	{
-		return array(
-        	'factories' => array(
-            	'funcservice' =>  function(\Zend\ServiceManager\ServiceLocatorInterface $sm) {
-	                return $sm->get('Config');
-				}
-			)
-		);
-	}
-
-	public function save($adapter, $recid, $record, $where, $original = array(), $lastid = array(), $remove = array(), $centais = array(), $modifier = array())
+	public function save($sm, $recid, $record, $where, $original = array(), $lastid = array(), $remove = array(), $centais = array(), $modifier = array())
     {
-/*     $adapter   - Zend db adapter
+/*     $sm        - in Controller $this->getServiceLocator();
 	 * $recid     - record ID in table
-	 * $record    - array of values to save. [key: <table_name>-<field_name> value: <value>]
+	 * $record    - array of values to save. key: <table_name>-<field_name> value: <value>
 	 * $where     - where to save. key: <table_name>-<field_name> value: <key in $record array>
 	 * $original  - array of original form values. To check for duplicates where duplicates not alowed.	Check performed if value in $original not equal to value in $record.
 	 * 				key: <table_name_field_name>-<field_name> value: <value>
@@ -56,23 +37,18 @@ class StandartFuncs extends AbstractActionController
 	 * 				! in $record's array "source" tables fields must be on top
 	 * $remove    - array of fields to delete and insert on edit action. key: <table_name>-<field_name> value: source of field value in form <table_name>-<field_name>
 	 * $centais   - array of fields to multiply by fixed values. key: <field_name> value: <fixed value>
-	 * $modifier  - if it not empty, modifier and modified fields added to array of records
+	 * $modifier  - if it not empty, 'modifier' and 'modified' fields are added to array of records
 	 *
 	 */
+		$adapter = $sm->get('Zend\Db\Adapter\Adapter');
 		$sql = new Sql($adapter);
-
-		$global_config = new \Zend\Config\Config( include APPLICATION_PATH.'/config/autoload/global.php' );
-
-		$config = array(
-			'ACL_TABLES' => $global_config->ACL_TABLES->toArray(),
-			'ACL_DB' => $global_config->ACL_DB
-		);
+		$config = $sm->get('Config');
 
 		$tables = array();
 		foreach ($record as $key => $value) {
 			$parts = explode('-', $key);
 			if(isset($parts[1])) {
-				if (is_array($value)) {  //-- if it 'enum' or 'list' field
+				if (is_array($value) && !empty($value)) {  //-- if it 'enum' or 'list' field
 					if (isset($value[0]['id'])) {  //-- so it's 'enum'
 						foreach ($value as $ekey => $evalue) {
 							$tables[$parts[0]][$parts[1]][] = $evalue['id'];
@@ -206,6 +182,7 @@ class StandartFuncs extends AbstractActionController
 						$set[$modifier[$table]['modified_name']] = new Expression('NOW()');
 					}
 				} else {
+					$modifier = $sm->get('Zend\Authentication\AuthenticationService')->getIdentity()->id;
 					$set['modifier'] = $modifier;
 					$set['modified'] = new Expression('NOW()');
 				}
@@ -342,6 +319,9 @@ class StandartFuncs extends AbstractActionController
 			'status' => 'success',
 			'message' => _('Affected rows: ').$affectedRows
 		);
+		if (!empty($lastId)) {
+			$dataset['last_id'] = $lastId;
+		}
 		return $dataset;
 	}
 
