@@ -14,7 +14,7 @@
 *
 * == TO START USING ==
 *   - install ZF2 skeleton-application as described in http://framework.zend.com/manual/2.0/en/user-guide/skeleton-application.html
-*   - include w2ui.js and w2ui.css in your application layout.phtml file
+*   - include w2ui-1.4.js and w2ui-1.4.css in your application layout.phtml file
 *
 * == USAGE ==
 * 	To generate CRUD for table 'apples':
@@ -25,7 +25,7 @@
 *
 ************************************************/
 
-// to do -- rec_id may be combined; in that case it must be combined by ":" in getdata & getrecord functions
+// to do -- rec_id gali būti kombinuotas; tada reikia kombinuoti recid dvitaškiu funkcijose getdata ir getrecord
 
 //---- CRUD form header messages
 $msg_add = 'New record';
@@ -459,6 +459,8 @@ class <?php echo $tableName; ?>Controller extends AbstractActionController
 		$adapter = $sm->get('Zend\Db\Adapter\Adapter');
 		$sql = new Sql($adapter);
 
+//		$lang = $where['lang'];
+
 		$select = $sql->select();
 		$select->from(array('C' => '<?php echo $argv[2]; ?>'));
 		$select->columns(array('recid' => '<?php echo $columns[0]; ?>', '<?php echo $argv[2]; ?>-<?php echo $columns[0]; ?>' => '<?php echo $columns[0]; ?>', '<?php echo $argv[2]; ?>-<?php echo $columns[1]; ?>' => '<?php echo $columns[1]; ?>'));
@@ -491,17 +493,8 @@ class <?php echo $tableName; ?>Controller extends AbstractActionController
 	private function _saverecord($recid, $record, $where, $original, $lastid, $remove, $centais)
 	{
 		$sm = $this->getServiceLocator();
-		$adapter = $sm->get('Zend\Db\Adapter\Adapter');
-		$sql = new Sql($adapter);
-
-		$auth = $sm->get('Zend\Authentication\AuthenticationService');
-		$usr = $auth->getIdentity();
-		$modifier = $usr->id;
-
 		$funcs = new \Tools\Model\StandartFuncs;
-		$status = $funcs->save($adapter, $recid, $record, $where, $original, $lastid, $remove, $centais, $modifier);
-
-		return $status;
+		return $funcs->save($sm, $recid, $record, $where, $original, $lastid, $remove, $centais, 1);
 	}
 
 	private function _delete($selected, $where)
@@ -810,3 +803,4 @@ function ob_end($fileName) {
 }
 
 ?>
+
