@@ -190,7 +190,7 @@ class StandartFuncs
 
 			if(!$recid[$table] || isset($wheres_new[$table])) {  //-- so it is insert or edit with possibly changed required unicue fields
 				if (isset($wheres_orig[$table]) && $wheres_orig[$table] != $wheres_new[$table]) {
-					if ($this->duplicated($adapter, $table_ident, $wheres_new[$table])) {
+					if ($this->duplicated($sm, $table_ident, $wheres_new[$table])) {
 						end($wheres_new[$table]);
 						$dataset = array(
 							'status' => 'success',
@@ -360,8 +360,9 @@ class StandartFuncs
 		return $dataset;
     }
 
-    public function duplicated($adapter = array(), $table = '', $where = array())
+    public function duplicated($sm = array(), $table = '', $where = array())
     {
+		$adapter = $sm->get('Zend\Db\Adapter\Adapter');
 		$sql = new Sql($adapter);
 		$select = $sql->select()
 			->from($table)
